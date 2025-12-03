@@ -26,8 +26,6 @@ func main() {
 		return
 	}
 
-	content = strings.TrimLeft(content, "\n") // Get rid of extra new lines in the beginning of banner file
-
 	charMap := buildCharMap(content)
 
 	renderText(text, charMap)

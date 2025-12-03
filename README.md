@@ -1,10 +1,19 @@
 # ASCII Art Generator
 
-Learn Go by building a command-line tool that converts text into ASCII art!
+![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-## What You'll Build
+A command-line tool that converts text into ASCII art using different banner styles!
 
-A program that takes text input and creates ASCII art like this:
+## Features
+
+- Convert any text to ASCII art
+- Multiple banner styles: `standard`, `shadow`, `thinkertoy`
+- Handle newlines and special characters
+- Automatic fallback to standard banner if style not found
+- Comprehensive error handling
+
+## Example Output
 
 ```
  _    _          _   _          
@@ -15,59 +24,83 @@ A program that takes text input and creates ASCII art like this:
 |_|  |_|  \___| |_| |_|  \___/  
 ```
 
-## Quick Start
+## Installation
 
-1. Make sure you have Go installed
-2. Start with Task 1 in `docs/tasks/`
-3. Work through tasks 1-8 in order
-4. Each task builds on the previous one
+1. Make sure you have Go installed (1.24+)
+2. Clone this repository
+3. Navigate to the project directory
 
-## What You'll Learn
+## Usage
 
-- **Go Basics**: modules, functions, variables
-- **File Operations**: reading files, handling errors
-- **Data Structures**: maps, slices, strings
-- **String Processing**: splitting, joining, manipulation
-- **Testing**: writing and running tests
-- **Code Organization**: clean, readable code
+```bash
+# Basic usage with default (standard) banner
+go run . "Hello World"
 
-## Learning Path
+# Specify a banner style
+go run . "Hello World" standard
+go run . "Hello World" shadow
+go run . "Hello World" thinkertoy
 
-| Task | Topic | What You'll Do |
-|------|-------|----------------|
-| 1 | Setup | Create basic Go program with command line args |
-| 2 | File Reading | Load banner template files |
-| 3 | Parsing | Convert file content into character maps |
-| 4 | Single Chars | Render individual ASCII art characters |
-| 5 | Words | Combine characters to make words |
-| 6 | Newlines | Handle `\n` for multiple lines |
-| 7 | Testing | Write basic tests for your code |
-| 8 | Organization | Clean up and structure your code |
+# Handle newlines
+go run . "Hello\nWorld"
+
+# Empty lines
+go run . "Line1\n\nLine3"
+```
 
 ## Project Structure
 
-Follows Go best practices while staying simple:
 ```
 ascii-art/
-├── cmd/ascii-art/   # Application entry point
-│   └── main.go      # Your main program
+├── main.go          # Application entry point
+├── ascii.go         # Core ASCII art functions
+├── ascii_test.go    # Comprehensive test suite
+├── go.mod           # Go module definition
 ├── assets/          # Banner template files
 │   ├── standard.txt
 │   ├── shadow.txt
 │   └── thinkertoy.txt
-├── test/            # Test files
-├── go.mod           # Go module definition
-└── docs/            # Learning tasks and requirements
+├── docs/            # Learning materials and requirements
+└── README.md        # This file
 ```
 
-## Getting Started
+## Functions
 
-Go to `docs/tasks/task-01-setup.md` and start coding!
+- `readBannerFile()` - Reads banner template files with fallback
+- `buildCharMap()` - Parses banner content into character mappings
+- `renderText()` - Handles text processing and newlines
+- `renderWord()` - Renders individual words as ASCII art
 
-## Final Usage
+## Testing
 
-When complete, your program will work like this:
+Run the comprehensive test suite:
+
 ```bash
-go run ./cmd/ascii-art "Hello"
-go run ./cmd/ascii-art "Hello\nWorld"
+go test -v
 ```
+
+Tests cover:
+- File reading and error handling
+- Character map building
+- Text rendering with various inputs
+- Edge cases and error conditions
+
+## Error Handling
+
+- Invalid banner names automatically fallback to `standard`
+- Missing characters fallback to space character
+- Graceful handling of empty inputs
+- Clear error messages for file reading issues
+
+## Learning Journey
+
+This project demonstrates:
+- **Go Basics**: modules, functions, variables, error handling
+- **File Operations**: reading files, handling missing files
+- **Data Structures**: maps, slices, string manipulation
+- **Testing**: unit tests, table-driven tests, output capture
+- **Code Organization**: clean, maintainable code structure
+
+## Note
+
+This is a personal learning project created to demonstrate Go programming skills. It's not actively maintained or open for contributions, but feel free to fork it for your own learning!
