@@ -2,6 +2,8 @@
 
 ![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Tests](https://github.com/karampouzouklis/zone01_ascii-art/actions/workflows/test.yml/badge.svg)
+
 
 A command-line tool that converts text into ASCII art using different banner styles!
 

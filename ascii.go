@@ -2,16 +2,39 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 )
 
-// readBannerFile reads the whole banner file into a string
+// readBannerFile reads the whole banner file from remote URL first, then local fallback
 func readBannerFile(filename string, path string) (string, error) {
+	// Try remote URL first
+	remoteURL := "https://platform.zone01.gr/api/content/root/public/subjects/ascii-art/" + filename + ".txt"
+	resp, err := http.Get(remoteURL)
+	if err == nil && resp.StatusCode == 200 {
+		defer resp.Body.Close()
+		data, err := io.ReadAll(resp.Body)
+		if err == nil {
+			return string(data), nil
+		}
+	}
 
-	data, err := os.ReadFile(path + filename + ".txt") // read the "banner name. Marge it with ".txt" and read the file
+	// Fallback to local file
+	data, err := os.ReadFile(path + filename + ".txt")
 	if err != nil && filename != "standard" {
 		fmt.Printf("WARNING: Banner '%s' not found, using standard\n", filename)
+		// Try remote standard first
+		resp, err := http.Get("https://platform.zone01.gr/api/content/root/public/subjects/ascii-art/standard.txt")
+		if err == nil && resp.StatusCode == 200 {
+			defer resp.Body.Close()
+			data, err := io.ReadAll(resp.Body)
+			if err == nil {
+				return string(data), nil
+			}
+		}
+		// Fallback to local standard
 		data, err = os.ReadFile(path + "standard.txt")
 		if err != nil {
 			return "", err
@@ -79,12 +102,14 @@ func renderWord(word string, charMap map[rune][]string) {
 	// Prepare 8 empty output lines
 	lines := make([]string, height)
 
+	invalidChar := []string{" I ", " n ", " v ", " a ", " l ", " i ", " d ", " ! "}
+
 	// For each character in the word
 	for _, char := range word {
 		pattern, exists := charMap[char]
 		if !exists {
-			// Fallback to space if character is missing
-			pattern = charMap[' ']
+			// Fallback if character is missing
+			pattern = invalidChar //charMap[' ']
 		}
 
 		// Concatenate each row of this character to the corresponding output row
