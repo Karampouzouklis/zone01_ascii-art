@@ -155,7 +155,7 @@ func TestRenderWord_MultipleCharacters(t *testing.T) {
 	}
 }
 
-// Test renderWord with missing character (should fallback to space)
+// Test renderWord with missing character (should show Invalid!)
 func TestRenderWord_MissingCharacter(t *testing.T) {
 	charMap := map[rune][]string{
 		' ': {"_", "_", "_", "_", "_", "_", "_", "_"},
@@ -165,7 +165,7 @@ func TestRenderWord_MissingCharacter(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	renderWord("X", charMap) // X doesn't exist, should use space
+	renderWord("X", charMap) // X doesn't exist, should show Invalid!
 
 	w.Close()
 	os.Stdout = old
@@ -175,8 +175,8 @@ func TestRenderWord_MissingCharacter(t *testing.T) {
 	output := buf.String()
 
 	lines := strings.Split(strings.TrimRight(output, "\n"), "\n")
-	if lines[0] != "_" {
-		t.Errorf("Expected fallback to space ('_'), got %q", lines[0])
+	if lines[0] != " I " {
+		t.Errorf("Expected 'Invalid!' pattern (' I '), got %q", lines[0])
 	}
 }
 
