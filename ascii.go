@@ -22,6 +22,8 @@ func readBannerFile(filename string, path string) (string, error) {
 }
 
 func buildCharMap(content string) map[rune][]string {
+	// Handle both Windows (\r\n) and Unix (\n) line endings
+	content = strings.ReplaceAll(content, "\r\n", "\n")
 	// Remove leading newlines that exist in banner files
 	content = strings.TrimLeft(content, "\n")
 	characters := strings.Split(content, "\n\n")
