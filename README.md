@@ -11,7 +11,9 @@ A command-line tool that converts text into ASCII art using different banner sty
 
 - Convert any text to ASCII art
 - Multiple banner styles: `standard`, `shadow`, `thinkertoy`
+- Remote banner file loading with local fallback
 - Handle newlines and special characters
+- Custom question mark pattern for unsupported characters
 - Automatic fallback to standard banner if style not found
 - Comprehensive error handling
 
@@ -89,8 +91,9 @@ Tests cover:
 
 ## Error Handling
 
+- Banner files are first attempted from remote URL, then local fallback
 - Invalid banner names automatically fallback to `standard`
-- Missing characters fallback to space character
+- Unsupported characters display a custom question mark pattern
 - Graceful handling of empty inputs
 - Clear error messages for file reading issues
 
