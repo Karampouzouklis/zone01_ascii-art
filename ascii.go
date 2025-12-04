@@ -102,7 +102,8 @@ func renderWord(word string, charMap map[rune][]string) {
 	// Prepare 8 empty output lines
 	lines := make([]string, height)
 
-	invalidChar := []string{" I ", " n ", " v ", " a ", " l ", " i ", " d ", " ! "}
+	//invalidChar := []string{" I ", " n ", " v ", " a ", " l ", " i ", " d ", " ! "}
+	invalidChar := []string{" __    ", "|***\\  ", "   )*| ", "  /*/  ", " |*|   ", " (*)   ", "       ", "       "}
 
 	// For each character in the word
 	for _, char := range word {
@@ -124,4 +125,26 @@ func renderWord(word string, charMap map[rune][]string) {
 	for _, line := range lines {
 		fmt.Println(line)
 	}
+}
+
+func validateInput(text string, charMap map[rune][]string) []rune {
+	var invalid []rune
+	for _, char := range text {
+		if char != '\n' && char != '\\' { // Skip newlines and escape chars
+			if _, exists := charMap[char]; !exists {
+				// Check if we already added this character
+				found := false
+				for _, inv := range invalid {
+					if inv == char {
+						found = true
+						break
+					}
+				}
+				if !found {
+					invalid = append(invalid, char)
+				}
+			}
+		}
+	}
+	return invalid
 }

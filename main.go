@@ -8,7 +8,8 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run . [TEXT] [BANNER NAME]")
+		fmt.Println("USAGE: go run . <TEXT> [BANNER]")
+		fmt.Println("       BANNER: standard (default), shadow, thinkertoy")
 		return
 	}
 
@@ -27,6 +28,15 @@ func main() {
 	}
 
 	charMap := buildCharMap(content)
+
+	if invalid := validateInput(text, charMap); len(invalid) > 0 {
+		// Convert runes to string for display
+		invalidChars := make([]string, len(invalid))
+		for i, char := range invalid {
+			invalidChars[i] = fmt.Sprintf("'%c'", char)
+		}
+		fmt.Printf("WARNING: Unsupported ASCII Characters %s found and replaced with question mark pattern.\n", strings.Join(invalidChars, ", "))
+	}
 
 	renderText(text, charMap)
 }

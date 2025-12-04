@@ -155,7 +155,7 @@ func TestRenderWord_MultipleCharacters(t *testing.T) {
 	}
 }
 
-// Test renderWord with missing character (should show Invalid!)
+// Test renderWord with missing character (should use question mark pattern)
 func TestRenderWord_MissingCharacter(t *testing.T) {
 	charMap := map[rune][]string{
 		' ': {"_", "_", "_", "_", "_", "_", "_", "_"},
@@ -165,7 +165,7 @@ func TestRenderWord_MissingCharacter(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	renderWord("X", charMap) // X doesn't exist, should show Invalid!
+	renderWord("X", charMap) // X doesn't exist, should use question mark pattern
 
 	w.Close()
 	os.Stdout = old
@@ -175,8 +175,16 @@ func TestRenderWord_MissingCharacter(t *testing.T) {
 	output := buf.String()
 
 	lines := strings.Split(strings.TrimRight(output, "\n"), "\n")
-	if lines[0] != " I " {
-		t.Errorf("Expected 'Invalid!' pattern (' I '), got %q", lines[0])
+	if len(lines) != 8 {
+		t.Errorf("Expected 8 lines for question mark pattern, got %d", len(lines))
+	}
+	
+	// Check multiple lines of the question mark pattern for accuracy
+	expectedPattern := []string{" __    ", "|***\\  ", "   )*| ", "  /*/  "}
+	for i, expected := range expectedPattern {
+		if i < len(lines) && !strings.Contains(lines[i], expected) {
+			t.Errorf("Line %d: expected pattern %q, got %q", i, expected, lines[i])
+		}
 	}
 }
 
@@ -252,6 +260,67 @@ func TestRenderText_EmptyLine(t *testing.T) {
 	}
 }
 
+// Test validateInput function
+func TestValidateInput_ValidCharacters(t *testing.T) {
+	charMap := map[rune][]string{
+		'A': {"A", "A", "A", "A", "A", "A", "A", "A"},
+		'B': {"B", "B", "B", "B", "B", "B", "B", "B"},
+		' ': {" ", " ", " ", " ", " ", " ", " ", " "},
+	}
+
+	invalid := validateInput("AB ", charMap)
+	if len(invalid) != 0 {
+		t.Errorf("Expected no invalid characters, got %v", invalid)
+	}
+}
+
+func TestValidateInput_InvalidCharacters(t *testing.T) {
+	charMap := map[rune][]string{
+		'A': {"A", "A", "A", "A", "A", "A", "A", "A"},
+		' ': {" ", " ", " ", " ", " ", " ", " ", " "},
+	}
+
+	invalid := validateInput("AXY", charMap)
+	if len(invalid) != 2 {
+		t.Errorf("Expected 2 invalid characters, got %d", len(invalid))
+	}
+	// Check that X and Y are in the invalid list
+	found := make(map[rune]bool)
+	for _, char := range invalid {
+		found[char] = true
+	}
+	if !found['X'] || !found['Y'] {
+		t.Errorf("Expected X and Y in invalid list, got %v", invalid)
+	}
+}
+
+func TestValidateInput_SkipsNewlines(t *testing.T) {
+	charMap := map[rune][]string{
+		'A': {"A", "A", "A", "A", "A", "A", "A", "A"},
+	}
+
+	// Should skip \n and \\ characters
+	invalid := validateInput("A\nX\\Y", charMap)
+	if len(invalid) != 2 {
+		t.Errorf("Expected 2 invalid characters (X,Y), got %d: %v", len(invalid), invalid)
+	}
+}
+
+func TestValidateInput_DuplicateCharacters(t *testing.T) {
+	charMap := map[rune][]string{
+		'A': {"A", "A", "A", "A", "A", "A", "A", "A"},
+	}
+
+	// Should only report X once even if it appears multiple times
+	invalid := validateInput("AXXXA", charMap)
+	if len(invalid) != 1 {
+		t.Errorf("Expected 1 invalid character (X), got %d: %v", len(invalid), invalid)
+	}
+	if invalid[0] != 'X' {
+		t.Errorf("Expected X, got %c", invalid[0])
+	}
+}
+
 // Integration test with real banner file
 func TestIntegration_StandardBanner(t *testing.T) {
 	content, err := readBannerFile("standard", "assets/")
@@ -272,5 +341,11 @@ func TestIntegration_StandardBanner(t *testing.T) {
 		if len(pattern) != 8 {
 			t.Errorf("Character %q should have 8 lines, got %d", char, len(pattern))
 		}
+	}
+
+	// Test validation with real character map
+	invalid := validateInput("Hello€ñ", charMap)
+	if len(invalid) == 0 {
+		t.Error("Expected invalid characters (€, ñ) to be detected")
 	}
 }
